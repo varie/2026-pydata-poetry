@@ -1,0 +1,299 @@
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>Teaching AI to Write Poetry in Three Languages: Fine-Tuning mBART for a Museum Exhibit</title>
+
+        <meta name="description" content="Teaching AI to Write Poetry in Three Languages: Fine-Tuning mBART for a Museum Exhibit">
+        <meta name="author" content="Sardana Ivanova">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- , maximum-scale=1.0, user-scalable=no" -->
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/dist/reset.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/dist/reveal.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/dist/theme/solarized.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/plugin/highlight/monokai.css" id="highlight-theme">
+
+        <link rel="stylesheet" href="overrides.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Fira+Code&display=swap" rel="stylesheet">
+        <!-- Font: IBM Plex Mono. Consider switching to Fira Code if you want a change. -->
+        <style>.reveal { font-family: 'IBM Plex Mono', monospace; }</style>
+    </head>
+
+    <body>
+
+        <div class="reveal">
+            <div class="slides">
+
+                <section id="title" data-state="no-toc-progress">
+                    <style>.header1 header:after { content: "Header 1 Example"; }</style>
+                    <h1><div style="margin-bottom: 0.5em !important ;">Teaching AI to Write Poetry in Three Languages: Fine-Tuning mBART for a Museum Exhibit</div></h1>
+                    <div style="padding-top:0in; padding-bottom: 0.25in;">
+                      <p>
+                        <img src="img/Heureka-runokone2(1).jpg" style="max-width: 100%; max-height: 90vh; height: auto; width: auto;"
+/><br />
+                        Sardana Ivanova
+                      </p>
+                    </div>
+                        <!-- /h3-->
+                    <p>2026-03-19</p>
+                </section>
+
+                <!--- Motivation --->
+
+                <section>
+                  <h2>Motivation</h2>
+                  <ul>
+                    <li>Heureka Science Center approached my supervisor Hannu Toivonen to build an AI poetry exhibit</li>
+                    <li>Hannu has worked on computational poetry generation for years &ndash; a natural fit</li>
+                    <li>Goal: make poetry writing easy and fun for museum visitors with no poetry experience
+                      <ul>
+                    <li>System generates several candidate lines &ndash; user just picks one</li>
+                      </ul>
+                    </li>
+                  </ul>
+                  <p>A project I worked on at the University of Helsinki, together with colleagues from the group</p>
+                </section>
+
+                <!--- How the system works --->
+
+                <section>
+                  <h2>How the system works</h2>
+                  <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" style="max-height: 20em; width: 100%;">
+                    <defs>
+                      <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#586e75"/>
+                      </marker>
+                    </defs>
+
+                    <!-- USER: insert keywords -->
+                    <rect x="175" y="15" width="550" height="58" rx="8" fill="#d4e8f7" stroke="#268bd2" stroke-width="2"/>
+                    <text x="450" y="50" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#073642">USER: insert keywords</text>
+
+                    <!-- arrow 1 + FIRST LINE MODEL -->
+                    <g class="fragment">
+                      <line x1="450" y1="73" x2="450" y2="148" stroke="#586e75" stroke-width="2" marker-end="url(#arrow)"/>
+                      <text x="465" y="118" font-family="sans-serif" font-size="20" fill="#586e75">keywords</text>
+                      <ellipse cx="450" cy="188" rx="165" ry="38" fill="#c8f0b0" stroke="#4a9e3f" stroke-width="2"/>
+                      <text x="450" y="194" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#073642">First-line model</text>
+                    </g>
+
+                    <!-- arrow 2 + USER: select poem line -->
+                    <g class="fragment">
+                      <line x1="450" y1="226" x2="450" y2="300" stroke="#586e75" stroke-width="2" marker-end="url(#arrow)"/>
+                      <text x="465" y="270" font-family="sans-serif" font-size="20" fill="#586e75">candidates</text>
+                      <rect x="60" y="302" width="780" height="62" rx="8" fill="#d4e8f7" stroke="#268bd2" stroke-width="2"/>
+                      <text x="450" y="328" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#073642">USER: select poem line</text>
+                      <text x="450" y="352" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#586e75">(or stop)</text>
+                    </g>
+
+                    <!-- arrow 3 + NEXT LINE MODEL -->
+                    <g class="fragment">
+                      <line x1="450" y1="364" x2="450" y2="448" stroke="#586e75" stroke-width="2" marker-end="url(#arrow)"/>
+                      <text x="465" y="396" font-family="sans-serif" font-size="20" fill="#586e75">selected line(s)</text>
+                      <ellipse cx="450" cy="490" rx="165" ry="38" fill="#c8f0b0" stroke="#4a9e3f" stroke-width="2"/>
+                      <text x="450" y="496" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#073642">Next-line model</text>
+                    </g>
+
+                    <!-- loop arrow -->
+                    <g class="fragment">
+                      <polyline points="615,490 860,490 860,333 840,333" stroke="#586e75" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+                      <text x="740" y="515" text-anchor="middle" font-family="sans-serif" font-size="20" fill="#586e75">candidates</text>
+                    </g>
+                  </svg>
+                  <aside class="notes">
+                      1. User gives keywords.
+                      2. System generates candidates for the first line based on keywords.
+                      3. User picks a line.
+                      4. System generates candidates for the next line based on previous line(s) and keywords.
+                      5. User picks a line.
+                      Steps 4–5 repeat until the user is done.
+                  </aside>
+                </section>
+
+                <!--- Models --->
+
+                <section>
+                  <h2>Fine-tuning mBART</h2>
+                  <p><span class="highlight">mBART</span> &ndash; multilingual sequence-to-sequence model (Liu&nbsp;et&nbsp;al., 2020)<br/>
+                  Pre-trained on 25 languages; fine-tuned on poem corpora:</p>
+                  <ul>
+                    <li>Finnish &ndash; Gutenberg, Wikisource, Poesia</li>
+                    <li>Swedish &ndash; Wikisource</li>
+                    <li>English &ndash; Gutenberg</li>
+                  </ul>
+                  <p>Three model variants:</p>
+                  <ul>
+                    <li><span class="highlight">First-line</span>: generates first line from keywords</li>
+                    <li><span class="highlight">NL-Single</span>: next line from the previous line</li>
+                    <li><span class="highlight">NL-Multi</span>: next line from up to three previous lines</li>
+                  </ul>
+                </section>
+
+
+<section>
+                  <h2>Training examples</h2>
+                  <table style="width: 100%;">
+                    <tr>
+                      <th style="width: 15%;">Model</th>
+                      <th style="width: 42.5%;">Source</th>
+                      <th style="width: 42.5%;">Target</th>
+                    </tr>
+                    <tr>
+                      <td style="white-space: nowrap;" rowspan="3">First-line</td>
+                      <td class="shrink">time elder</td>
+                      <td class="shrink">Arise, as in that elder time,</td>
+                    </tr>
+                    <tr>
+                      <td class="shrink">sublime energetic</td>
+                      <td class="shrink">Warm, energetic, chaste, sublime!</td>
+                    </tr>
+                    <tr>
+                      <td class="shrink">godlike wonder</td>
+                      <td class="shrink">Thy wonders, in that godlike age,</td>
+                    </tr>
+                    <tr>
+                      <td style="white-space: nowrap;" rowspan="2">NL-Single</td>
+                      <td class="shrink">Arise, as in that elder time,</td>
+                      <td class="shrink">Warm, energetic, chaste, sublime!</td>
+                    </tr>
+                    <tr>
+                      <td class="shrink">Warm, energetic, chaste, sublime!</td>
+                      <td class="shrink">Thy wonders, in that godlike age,</td>
+                    </tr>
+                    <tr>
+                      <td style="white-space: nowrap;" rowspan="2">NL-Multi</td>
+                      <td class="shrink">Arise, as in that elder time, &lt;SEP&gt;</td>
+                      <td class="shrink">Warm, energetic, chaste, sublime!</td>
+                    </tr>
+                    <tr>
+                      <td class="shrink">Arise, as in that elder time, &lt;SEP&gt; Warm, energetic, chaste, sublime! &lt;SEP&gt;</td>
+                      <td class="shrink">Thy wonders, in that godlike age,</td>
+                    </tr>
+                  </table>
+                </section>
+
+                <!--- Heureka --->
+
+                <section>
+                  <h2>Heureka Science Center</h2>
+                  <img src="img/Heureka-setup(3).jpg" style="max-width: 100%; max-height: 14em; height: auto; width: auto;"/>
+                  <p>Deployed as a public exhibit at Heureka Science Center</p>
+                  <p>Vintage typewriter interface + receipt printer for the poem</p>
+                </section>
+
+                <section>
+                  <h2>An example poem</h2>
+                  <img src="img/Midsummer-poem(1).jpg" style="max-width: 100%; max-height: 22em; height: auto; width: auto;"/>
+                </section>
+
+                <!--- Links --->
+
+                <section>
+                  <h2>Thank you!</h2>
+                  <div style="display: flex; flex-direction: column; gap: 0.6em; margin-top: 0.5em;">
+<div style="display: flex; align-items: center; gap: 1em;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sardana.codes/" style="flex-shrink: 0;"/>
+                      <span>My personal page: <a href="https://sardana.codes/">sardana.codes</a></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1em;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.linkedin.com/in/sardana-ivanova/" style="flex-shrink: 0;"/>
+                      <span>LinkedIn: <a href="https://www.linkedin.com/in/sardana-ivanova/">linkedin.com/in/sardana-ivanova</a></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1em; padding-left: 0.3em;">
+                      <span class="shrink" style="font-size: 70% !important;">Boggia, Ivanova, Linkola, Kantosalo &amp; Toivonen (2022). <em>One Line at a Time: Generation and Internal Evaluation of Interactive Poetry.</em> International Conference on Computational Creativity (ICCC 2022).</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1em; padding-left: 0.3em;">
+                      <span class="shrink" style="font-size: 70% !important;">Boggia, Ivanova, Linkola, Toivonen &amp; Kantosalo (2022). <em>Casual Poetry Creators: A Design Pattern and Internal Evaluation Measures.</em> International Conference on Computational Creativity (ICCC 2022).</span>
+                    </div>
+                  </div>
+                  <p class="shrink" style="margin-top: 0.8em;">Photos of the exhibit: Hannu Toivonen</p>
+                </section>
+
+
+
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/dist/reveal.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/plugin/notes/notes.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/plugin/markdown/markdown.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/plugin/highlight/highlight.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.1.2/plugin/zoom/zoom.js"></script>
+
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                center: true,
+                history: true,
+                hash: true,
+
+                // The "normal" size of the presentation, aspect ratio will be preserved
+                // when the presentation is scaled to fit different resolutions. Can be
+                // specified using percentage units.
+                width: 1280, //960,
+                //height: 720, //700,
+                height: 1024,
+                //width: 960,
+                //height: 700,
+
+                // Factor of the display size that should remain empty around the content
+                margin: 0.1,
+
+                // Bounds for smallest/largest possible scale to apply to content
+                minScale: 0.2,
+                maxScale: 1.0,
+
+                //theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+                // transition: Reveal.getQueryHash().transition || 'fade', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Shows the slide number using default formatting
+                //Reveal.configure({ slideNumber: true });
+                //slideNumber: true,
+
+                //if true (default), fragments are generated on separate pages of pdfs
+                //pdfSeparateFragments: false,
+
+                // Slide number formatting can be configured using these variables:
+                //  "h.v":  horizontal . vertical slide number (default)
+                //  "h/v":  horizontal / vertical slide number
+                //    "c":  flattened slide number
+                //  "c/t":  flattened slide number / total slides
+                //Reveal.configure({ slideNumber: 'c' });
+                slideNumber: 'c',
+
+                // Parallax scrolling
+                // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+                // parallaxBackgroundSize: '2100px 900px',
+
+                // Optional reveal.js plugins
+                // More info https://github.com/hakimel/reveal.js#dependencies
+                /***
+                dependencies: [
+                    { src: './reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: './reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: './reveal.js/plugin/highlight/highlight.js' },
+                    { src: './reveal.js/plugin/search/search.js', async: true },
+                    { src: './reveal.js/plugin/zoom-js/zoom.js', async: true },
+                    { src: './reveal.js/plugin/notes/notes.js', async: true }
+                ]
+                ***/
+                // Learn about plugins: https://revealjs.com/plugins/
+                plugins: [ RevealMarkdown, RevealZoom, RevealHighlight, RevealNotes ]
+            });
+
+        </script>
+
+    </body>
+</html>
