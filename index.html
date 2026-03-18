@@ -261,18 +261,172 @@
                   </aside>
                 </section>
 
+                <!--- Live demo --->
+
+                <section id="demo">
+                  <h2>Try it live!</h2>
+                  <div id="demo-container" style="font-size: 0.75em;">
+
+                    <div style="display: flex; gap: 0.5em; align-items: center; margin-bottom: 0.5em;">
+                      <label style="color: #073642;">Language:</label>
+                      <select id="lang"
+                              style="padding: 0.4em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; border: 1px solid #268bd2; background: #fdf6e3; color: #073642; border-radius: 3px;">
+                        <option value="fi">Finnish</option>
+                        <option value="sv">Swedish</option>
+                        <option value="en">English</option>
+                      </select>
+                    </div>
+                    <div style="display: flex; gap: 0.5em; align-items: center; margin-bottom: 0.8em;">
+                      <input type="text" id="keywords" placeholder="Enter keywords..."
+                             style="flex: 1; padding: 0.4em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; border: 1px solid #268bd2; background: #fdf6e3; color: #073642; border-radius: 3px;"
+                             onkeydown="if(event.key==='Enter'){generateFirstLine();event.stopPropagation();}"/>
+                      <button onclick="generateFirstLine()"
+                              style="padding: 0.4em 0.8em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; background: #268bd2; color: white; border: none; cursor: pointer; border-radius: 3px;">
+                        Generate
+                      </button>
+                      <button id="reset-btn" onclick="resetDemo()"
+                              style="padding: 0.4em 0.8em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; background: #cb6a2f; color: white; border: none; cursor: pointer; border-radius: 3px; display: none;">
+                        Start over
+                      </button>
+                    </div>
+
+                    <div id="poem-display"
+                         style="display: none; margin-bottom: 0.8em; padding: 0.5em 0.8em; border-left: 3px solid #268bd2; font-style: italic; color: #073642; line-height: 1.8;"></div>
+
+                    <div id="status" style="color: #586e75; margin-bottom: 0.5em;"></div>
+
+                    <div id="candidates" style="display: flex; flex-direction: column; gap: 0.4em;"></div>
+
+                  </div>
+                  <aside class="notes">
+                      Now let's try it live — ask the audience for keywords and a language, and build a poem together!
+                  </aside>
+                  <script>
+                    var demoLines = [];
+
+                    function generateFirstLine() {
+                      var keywords = document.getElementById('keywords').value.trim();
+                      var lang = document.getElementById('lang').value;
+                      if (!keywords) { setDemoStatus('Please enter some keywords.'); return; }
+                      demoLines = [];
+                      updatePoemDisplay();
+                      setDemoStatus('Generating...');
+                      clearCandidates();
+                      fetch('https://api.sardana.codes/first-line', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ keywords: keywords, lang: lang })
+                      })
+                      .then(function(r) { return r.json(); })
+                      .then(function(data) {
+                        setDemoStatus('Pick a line:');
+                        showCandidates(data.candidates);
+                        document.getElementById('reset-btn').style.display = 'inline-block';
+                      })
+                      .catch(function() { setDemoStatus('Error connecting to API.'); });
+                    }
+
+                    function generateNextLine() {
+                      var lang = document.getElementById('lang').value;
+                      setDemoStatus('Generating...');
+                      clearCandidates();
+                      fetch('https://api.sardana.codes/next-line', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lines: demoLines, lang: lang })
+                      })
+                      .then(function(r) { return r.json(); })
+                      .then(function(data) {
+                        setDemoStatus('Pick a line:');
+                        showCandidates(data.candidates);
+                      })
+                      .catch(function() { setDemoStatus('Error connecting to API.'); });
+                    }
+
+                    function pickLine(line) {
+                      demoLines.push(line);
+                      updatePoemDisplay();
+                      generateNextLine();
+                    }
+
+                    function updatePoemDisplay() {
+                      var el = document.getElementById('poem-display');
+                      if (demoLines.length === 0) {
+                        el.style.display = 'none';
+                        el.innerHTML = '';
+                      } else {
+                        el.style.display = 'block';
+                        el.innerHTML = demoLines.join('<br/>');
+                      }
+                      var candidates = document.getElementById('candidates');
+                      if (demoLines.length >= 5) {
+                        candidates.style.overflowY = 'auto';
+                        candidates.style.maxHeight = '12em';
+                      } else {
+                        candidates.style.overflowY = 'visible';
+                        candidates.style.maxHeight = 'none';
+                      }
+                    }
+
+
+                    function showCandidates(candidates) {
+                      var el = document.getElementById('candidates');
+                      el.innerHTML = '';
+                      candidates.forEach(function(line) {
+
+                        var btn = document.createElement('button');
+                        btn.textContent = line;
+                        btn.style.cssText = 'padding: 0.4em 0.8em; font-family: "IBM Plex Mono", monospace; font-size: 1em; background: #f0f4d8; color: #073642; border: 1px solid #859900; cursor: pointer; text-align: left; border-radius: 3px;';
+                        btn.onmouseover = function() { this.style.background = '#d4e8a0'; };
+                        btn.onmouseout = function() { this.style.background = '#f0f4d8'; };
+                        btn.onclick = function() { pickLine(line); };
+                        el.appendChild(btn);
+                      });
+                      var stop = document.createElement('button');
+                      stop.textContent = 'Stop';
+                      stop.style.cssText = 'padding: 0.4em 0.8em; font-family: "IBM Plex Mono", monospace; font-size: 1em; background: #fdf6e3; color: #586e75; border: 1px solid #586e75; cursor: pointer; text-align: left; border-radius: 3px;';
+                      stop.onmouseover = function() { this.style.background = '#eee8d5'; };
+                      stop.onmouseout = function() { this.style.background = '#fdf6e3'; };
+                      stop.onclick = function() { clearCandidates(); setDemoStatus('Poem complete!'); };
+                      if (demoLines.length > 0) {
+                        el.appendChild(stop);
+                      }
+                    }
+
+                    function clearCandidates() {
+                      document.getElementById('candidates').innerHTML = '';
+                    }
+
+                    function setDemoStatus(msg) {
+                      document.getElementById('status').textContent = msg;
+                    }
+
+                    function resetDemo() {
+                      demoLines = [];
+                      clearCandidates();
+                      setDemoStatus('');
+                      updatePoemDisplay();
+                      document.getElementById('reset-btn').style.display = 'none';
+                    }
+                  </script>
+                </section>
+
                 <!--- Links --->
 
                 <section>
                   <h2>Thank you!</h2>
-                  <div style="display: flex; flex-direction: column; gap: 0.6em; margin-top: 0.5em;">
-<div style="display: flex; align-items: center; gap: 1em;">
-                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://sardana.codes/" style="flex-shrink: 0;"/>
+                  <div style="display: flex; flex-direction: column; gap: 0.4em; margin-top: 0.3em;">
+                    <div style="display: flex; align-items: center; gap: 0.8em;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://sardana.codes/" style="flex-shrink: 0;"/>
                       <span>My personal page: <a href="https://sardana.codes/">sardana.codes</a></span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 1em;">
-                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.linkedin.com/in/sardana-ivanova/" style="flex-shrink: 0;"/>
+                    <div style="display: flex; align-items: center; gap: 0.8em;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://www.linkedin.com/in/sardana-ivanova/" style="flex-shrink: 0;"/>
                       <span>LinkedIn: <a href="https://www.linkedin.com/in/sardana-ivanova/">linkedin.com/in/sardana-ivanova</a></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.8em;">
+                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https://sardana.codes/2026-pydata-poetry" style="flex-shrink: 0;"/>
+                      <span>Try the demo: <a href="https://sardana.codes/2026-pydata-poetry">sardana.codes/2026-pydata-poetry</a></span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 1em;">
                       <span>Open to new opportunities — if you're looking for someone to train and deploy production-ready ML models, let's chat!</span>
@@ -370,6 +524,14 @@
                 ***/
                 // Learn about plugins: https://revealjs.com/plugins/
                 plugins: [ RevealMarkdown, RevealZoom, RevealHighlight, RevealNotes ]
+            });
+
+            Reveal.on('slidechanged', function(event) {
+                if (event.currentSlide.id === 'demo') {
+                    Reveal.configure({ center: false });
+                } else {
+                    Reveal.configure({ center: true });
+                }
             });
 
         </script>
