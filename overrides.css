@@ -38,7 +38,11 @@ img.noframe {
 
 table tr td {
     color: black;
-    font-family: Arial !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+}
+
+table tr.row-gap td {
+    padding-bottom: 0.8em !important;
 }
 
 table tr th {
