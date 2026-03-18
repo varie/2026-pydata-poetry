@@ -42,6 +42,29 @@
                     </div>
                         <!-- /h3-->
                     <p>2026-03-19</p>
+                    <aside class="notes">
+                        Quick show of hands: who here likes poetry?
+                        Has anyone tried writing their own poem?
+                        Today I'll show you how we taught AI to help people write poems — even if they've never written one before.
+                    </aside>
+                </section>
+
+                <!--- My poem --->
+
+                <section>
+                  <h2>I also tried writing a poem...</h2>
+                  <p style="text-align: left; line-height: 1.8;">
+                    The weather is cold and rainy.<br/>
+                    It is good to sit inside self-isolated.<br/>
+                    It is cosy to look outside from a window.<br/>
+                    There is renovation going on in our building.<br/>
+                    It is very noisy to be here.<br/>
+                    Cities should postpone renovations.<br/>
+                    Though, time waits for no one.<br/>
+                    Time goes, we live, pandemic continues.<br/>
+                    Using car is bad for environment.<br/>
+                    Using public transport is scary.
+                  </p>
                 </section>
 
                 <!--- Motivation --->
@@ -58,6 +81,14 @@
                     </li>
                   </ul>
                   <p>A project I worked on at the University of Helsinki, together with colleagues from the group</p>
+                  <aside class="notes">
+                      So we made a helper to write poems!
+                      Heureka Science Center came to my supervisor Hannu Toivonen with the idea of an AI poetry exhibit.
+                      Hannu had been working on computational poetry for years, so it was a natural fit.
+                      The goal was to make poetry writing easy and fun for museum visitors — people with no poetry experience.
+                      The system generates candidate lines and the user just picks one — no blank page anxiety.
+                      This was a project I worked on at the University of Helsinki together with colleagues.
+                  </aside>
                 </section>
 
                 <!--- How the system works --->
@@ -107,12 +138,11 @@
                     </g>
                   </svg>
                   <aside class="notes">
-                      1. User gives keywords.
-                      2. System generates candidates for the first line based on keywords.
-                      3. User picks a line.
-                      4. System generates candidates for the next line based on previous line(s) and keywords.
-                      5. User picks a line.
-                      Steps 4–5 repeat until the user is done.
+                      The user starts by typing in some keywords — things they want the poem to be about.
+                      The system then generates several candidate lines for the first line of the poem.
+                      The user picks the one they like best.
+                      From there, the system generates candidates for the next line, based on what was already written.
+                      The user picks again — and this repeats until they're happy with their poem.
                   </aside>
                 </section>
 
@@ -133,11 +163,18 @@
                     <li><span class="highlight">NL-Single</span>: next line from the previous line</li>
                     <li><span class="highlight">NL-Multi</span>: next line from up to three previous lines</li>
                   </ul>
+                  <aside class="notes">
+                      We used mBART — a multilingual sequence-to-sequence model pre-trained on 25 languages, which made it a natural fit for a trilingual exhibit.
+                      An important constraint was that Heureka wanted the system to run on their own hardware — no external APIs, no ongoing costs, no changes needed after deployment.
+                      We fine-tuned it on poetry corpora in Finnish, Swedish, and English.
+                      We trained three variants: one for generating the first line from keywords, and two for generating the next line — one using just the previous line, and one using up to three previous lines.
+                  </aside>
                 </section>
 
 
 <section>
                   <h2>Training examples</h2>
+
                   <table style="width: 100%;">
                     <tr>
                       <th style="width: 15%;">Model</th>
@@ -176,6 +213,12 @@
                       <td class="shrink">Thy wonders, in that godlike age,</td>
                     </tr>
                   </table>
+                  <aside class="notes">
+                      This slide shows how we constructed the training examples for each model variant.
+                      For the first-line model, the input is a set of keywords extracted from the target line, and the output is the line itself.
+                      For NL-Single, the input is the previous line and the output is the next one.
+                      For NL-Multi, multiple previous lines are concatenated with a special separator token, and the output is the next line coming after all the lines in the input.
+                  </aside>
                 </section>
 
                 <!--- Heureka --->
@@ -185,11 +228,19 @@
                   <img src="img/Heureka-setup(3).jpg" style="max-width: 100%; max-height: 14em; height: auto; width: auto;"/>
                   <p>Deployed as a public exhibit at Heureka Science Center</p>
                   <p>Vintage typewriter interface + receipt printer for the poem</p>
+                  <aside class="notes">
+                      And here it is in action at Heureka!
+                      The interface is a vintage typewriter — visitors type their keywords on it.
+                      And at the end, the poem gets printed out on a receipt printer, so they can take it home.
+                  </aside>
                 </section>
 
                 <section>
                   <h2>An example poem</h2>
                   <img src="img/Midsummer-poem(1).jpg" style="max-width: 100%; max-height: 22em; height: auto; width: auto;"/>
+                  <aside class="notes">
+                      And here's an example of a poem that came out of it — printed on the receipt printer, ready to take home.
+                  </aside>
                 </section>
 
                 <!--- Links --->
@@ -205,6 +256,9 @@
                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://www.linkedin.com/in/sardana-ivanova/" style="flex-shrink: 0;"/>
                       <span>LinkedIn: <a href="https://www.linkedin.com/in/sardana-ivanova/">linkedin.com/in/sardana-ivanova</a></span>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 1em;">
+                      <span>Open to new opportunities — if you're looking for someone to train and deploy production-ready ML models, let's chat!</span>
+                    </div>
                     <div style="display: flex; align-items: center; gap: 1em; padding-left: 0.3em;">
                       <span class="shrink" style="font-size: 70% !important;">Boggia, Ivanova, Linkola, Kantosalo &amp; Toivonen (2022). <em>One Line at a Time: Generation and Internal Evaluation of Interactive Poetry.</em> International Conference on Computational Creativity (ICCC 2022).</span>
                     </div>
@@ -213,6 +267,13 @@
                     </div>
                   </div>
                   <p class="shrink" style="margin-top: 0.8em;">Photos of the exhibit: Hannu Toivonen</p>
+                  <aside class="notes">
+                      That's all from me — thank you!
+                      You can find me at sardana.codes, or connect on LinkedIn.
+                      I'm also open to new opportunities — if you're looking for someone to train and deploy production-ready ML models, let's chat!
+                      If you want to dig deeper, here are the two papers we published on this project at ICCC 2022.
+                      Happy to take any questions!
+                  </aside>
                 </section>
 
 
