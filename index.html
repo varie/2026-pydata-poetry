@@ -151,7 +151,7 @@
                 <section>
                   <h2>Fine-tuning mBART</h2>
                   <p><span class="highlight">mBART</span> &ndash; multilingual sequence-to-sequence model (Liu&nbsp;et&nbsp;al., 2020)<br/>
-                  Pre-trained on 25 languages; fine-tuned on poem corpora:</p>
+                  Pre-trained on multiple languages; fine-tuned on poem corpora:</p>
                   <ul>
                     <li>Finnish &ndash; Gutenberg, Wikisource, Poesia</li>
                     <li>Swedish &ndash; Wikisource</li>
@@ -164,7 +164,7 @@
                     <li><span class="highlight">NL-Multi</span>: next line from up to three previous lines</li>
                   </ul>
                   <aside class="notes">
-                      We used mBART — a multilingual sequence-to-sequence model pre-trained on 25 languages, which made it a natural fit for a trilingual exhibit.
+                      We used mBART — a multilingual sequence-to-sequence model — a natural fit as it supports the three languages we needed: Finnish, Swedish, and English.
                       An important constraint was that Heureka wanted the system to run on their own hardware — no external APIs, no ongoing costs, no changes needed after deployment.
                       We fine-tuned it on poetry corpora in Finnish, Swedish, and English.
                       We trained three variants: one for generating the first line from keywords, and two for generating the next line — one using just the previous line, and one using up to three previous lines.
