@@ -269,19 +269,24 @@
 
                     <div style="display: flex; gap: 0.5em; align-items: center; margin-bottom: 0.5em;">
                       <label style="color: #073642;">Language:</label>
-                      <select id="lang" disabled
-                              style="padding: 0.4em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; border: 1px solid #268bd2; background: #fdf6e3; color: #073642; border-radius: 3px; opacity: 0.45; cursor: not-allowed;">
+                      <select id="lang"
+                              style="padding: 0.4em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; border: 1px solid #268bd2; background: #fdf6e3; color: #073642; border-radius: 3px;">
                         <option value="fi">Finnish</option>
                         <option value="sv">Swedish</option>
                         <option value="en">English</option>
                       </select>
                     </div>
                     <div style="display: flex; gap: 0.5em; align-items: center; margin-bottom: 0.8em;">
-                      <input type="text" id="keywords" placeholder="Enter keywords..." disabled
-                             style="flex: 1; padding: 0.4em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; border: 1px solid #268bd2; background: #fdf6e3; color: #073642; border-radius: 3px; opacity: 0.45; cursor: not-allowed;"/>
-                      <button disabled
-                              style="padding: 0.4em 0.8em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; background: #268bd2; color: white; border: none; border-radius: 3px; opacity: 0.45; cursor: not-allowed;">
+                      <input type="text" id="keywords" placeholder="Enter keywords..."
+                             style="flex: 1; padding: 0.4em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; border: 1px solid #268bd2; background: #fdf6e3; color: #073642; border-radius: 3px;"
+                             onkeydown="if(event.key==='Enter'){generateFirstLine();event.stopPropagation();}"/>
+                      <button onclick="generateFirstLine()"
+                              style="padding: 0.4em 0.8em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; background: #268bd2; color: white; border: none; cursor: pointer; border-radius: 3px;">
                         Generate
+                      </button>
+                      <button id="reset-btn" onclick="resetDemo()"
+                              style="padding: 0.4em 0.8em; font-family: 'IBM Plex Mono', monospace; font-size: 1em; background: #cb6a2f; color: white; border: none; cursor: pointer; border-radius: 3px; display: none;">
+                        Start over
                       </button>
                     </div>
 
@@ -291,11 +296,6 @@
                     <div id="status" style="color: #586e75; margin-bottom: 0.5em;"></div>
 
                     <div id="candidates" style="display: flex; flex-direction: column; gap: 0.4em;"></div>
-
-                    <p style="color: #586e75; font-style: italic; margin-top: 0.8em;">
-                      The live demo is no longer running. Interested in seeing it in action?
-                      <a href="https://www.linkedin.com/in/sardana-ivanova/" target="_blank" style="color: #268bd2;">linkedin.com/in/sardana-ivanova</a>
-                    </p>
 
                   </div>
                   <aside class="notes">
